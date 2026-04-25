@@ -4,6 +4,11 @@ Train and run inference on [RF-DETR](https://github.com/roboflow/rf-detr) — Ro
 
 This repo is the companion code to the YouTube walkthrough: **[link coming soon]**.
 
+<p align="center">
+  <img src="assets/img1.png" width="49%" alt="RF-DETR detection example 1" />
+  <img src="assets/img2.png" width="49%" alt="RF-DETR detection example 2" />
+</p>
+
 ---
 
 ## What this demo shows
