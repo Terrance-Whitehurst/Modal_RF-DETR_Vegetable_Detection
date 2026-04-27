@@ -11,3 +11,6 @@ wheels/
 
 # Claude Code
 .claude/
+
+# Multi-Team Chat — agent session data
+.pi/multi-team/sessions/
