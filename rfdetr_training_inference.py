@@ -99,11 +99,11 @@ def infer(checkpoint_dir: str, image_path: str, threshold: float = 0.5):
 @app.local_entrypoint()
 def main():
     config = DatasetConfig(
-        workspace_id="roboflow-100",
-        project_id="vehicles-q0x2v",
-        version=2,
+        workspace_id="flovision",
+        project_id="vegetables_detector_annotation-sud2e",
+        version=1,
         format="coco",
-        target_class="vehicle",
+        target_class="vegetable",
     )
     dataset_dir = download_dataset.remote(config)
     checkpoint_dir = train.remote(dataset_dir)

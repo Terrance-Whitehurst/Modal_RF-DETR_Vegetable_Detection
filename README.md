@@ -124,11 +124,75 @@ Note: heavyweight imports (`rfdetr`, `roboflow`) are deferred to inside the func
 
 ---
 
+## FiftyOne dataset exploration
+
+A separate local script — `fiftyone_workflow.py` — lets you explore the vegetables-detector dataset visually before (or after) training. It runs entirely on your machine; Modal is only needed for GPU training.
+
+### What it computes
+
+| Step | What happens | FiftyOne key / field |
+|------|--------------|----------------------|
+| Dataset import | All three COCO splits (train / valid / test) merged into one persistent dataset, each sample tagged with its split | `ground_truth` label field, `train` / `valid` / `test` tags |
+| CLIP embeddings + UMAP | 2-D projection of every image's CLIP embedding — lets you spot clusters, outliers, and near-duplicates in the App's **Embeddings** panel | `clip_umap` brain key |
+| Similarity index | Nearest-neighbour index over CLIP embeddings — enables the **Find similar** button in the App | `clip_similarity` brain key |
+| Image quality | Per-sample brightness, blurriness, exposure, entropy, aspect ratio — surfaced as numeric fields you can sort/filter | plugin fields **or** `quality_brightness`, `quality_blurriness`, `quality_aspect_ratio` fallback fields |
+
+### Install steps
+
+```bash
+# 1. Sync all local dependencies (fiftyone, umap-learn, open-clip-torch, Pillow, numpy)
+uv sync
+
+# 2. (Recommended) Install the image-quality plugin for richer quality metrics
+uv run fiftyone plugins download https://github.com/jacobmarks/image-quality-issues
+```
+
+### Set your Roboflow API key
+
+```bash
+export ROBOFLOW_API_KEY="<your-roboflow-api-key>"
+```
+
+### Run the workflow
+
+```bash
+uv run python fiftyone_workflow.py
+```
+
+The script will:
+1. Download the dataset to `./data/vegetables_detector_annotation-sud2e/1/` (skipped on re-runs if already present).
+2. Build a persistent FiftyOne dataset named `vegetables_detector` (or load it if it already exists).
+3. Compute CLIP embeddings → UMAP projection → similarity index.
+4. Run image-quality analysis (plugin if installed, PIL/numpy fallback otherwise).
+5. Open the FiftyOne App at **http://localhost:5151** in your browser.
+
+Press **Ctrl-C** in the terminal when you're done.
+
+### Exploring in the App
+
+- **Embeddings panel** → select brain key `clip_umap` to see the 2-D cluster view.
+- **Similarity** → click any image then "Find similar" to surface near-duplicates.
+- **Filters sidebar** → sort/filter by `quality_brightness`, `quality_blurriness`, etc. to surface low-quality images.
+- **Tags** → filter by `train`, `valid`, or `test` to inspect each split independently.
+
+### Re-opening the dataset later
+
+The FiftyOne dataset is stored in your local FiftyOne DB (`~/.fiftyone/`). To reload it any time without re-running the full workflow:
+
+```python
+import fiftyone as fo
+dataset = fo.load_dataset("vegetables_detector")
+fo.launch_app(dataset)
+```
+
+---
+
 ## File layout
 
 ```
 .
-├── rfdetr_training_inference.py   # The whole pipeline
+├── rfdetr_training_inference.py   # Modal training + inference pipeline
+├── fiftyone_workflow.py           # Local FiftyOne exploration script
 ├── pyproject.toml                 # Dependencies (uv-managed)
 ├── uv.lock
 └── README.md
