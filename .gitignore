@@ -14,3 +14,6 @@ wheels/
 
 # Multi-Team Chat — agent session data
 .pi/multi-team/sessions/
+
+# Multi-Team Chat — keep entire .pi directory private
+.pi/
